@@ -162,9 +162,9 @@ Each list resides within a file.  You can customize the file paths with ~denote-
 
 You can easily add a value to each list with ~denote-paperless-add-correspondant~ and ~denote-paperless-add-doctype~ respectively.  Each of these commands will check for existing values within the files and prevent any (case sensitive) duplicates from being added.
 
-For instance, you can get started with these files:
-
 Alternatively, you can populate each file manually.  However, you will need to call ~denote-paperless-refresh-correspondants~ and/or ~denote-paperless-refresh-doctypes~ afterward to refresh each list by reading the files.
+
+For instance, you can get started with these files:
 
 ~correspondents.txt~
 
