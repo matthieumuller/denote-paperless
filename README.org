@@ -1,0 +1,324 @@
+* denote-paperless.el
+
+#+begin_quote
+This project is young, please report any bug you find [[https://github.com/matthieumuller/denote-paperless/issues][here]].
+#+end_quote
+
+Paperless on top of [[https://protesilaos.com/emacs/denote][denote.el]], an efficient, low overhead and no-nonsense approach to document management.
+
+-----
+
+This project is an Emacs package that extends Denote functionality to work with a trimed-down version of [[https://docs.paperless-ngx.com/][Paperless-ngx]] workflow.  In a nutshell, it allows you to easily manage your files within Emacs by renaming them thanks to a curated set of fields to qualify your documents metadata.
+
+Similarly to Denote, Denote Paperless aims to be a simple-to-use, focused-in-scope, and an effective document management tool.
+
+** Overview
+
+Compared to Denote, Denote Paperless introduces new concepts:
+
+*** A tried-and-tested workflow
+
+I am not inventing anything new, the people who worked on [[https://github.com/the-paperless-project/paperless][Paperless]], [[https://github.com/jonaswinkler/paperless-ng][Paperless-ng]] and [[https://github.com/paperless-ngx/paperless-ngx][Paperless-ngx]] had already figured –in my humble opinion– a very good way to handle documents.
+
+I took heavy inspiration from [[https://docs.paperless-ngx.com/usage/][the usage phylosophy described by Paperless-ngx]] to lay down the groundwork for this package.
+
+*** Same file-naming scheme, different components
+
+Denote Paperless builds upon the curated Denote's code base to bring life to 4 new subcomponents:
+
+1. A document date,
+2. A document type,
+3. A correspondent,
+4. An archive Serial Number or ASN.
+
+A concatenation of these new subcomponents replace Denote's signature as a whole, with the following format:
+
+#+begin_src text
+DOCDATE%%CORRESPONDENT&&DOCTYPE##ASN
+#+end_src
+
+As you can see, Denote Paperless introduces 3 new delimiters: ~%~ for the correspondent, ~&~ for the document type, and ~#~ for the ASN.  They have been thoughtfully picked to work as-is in regular expressions (e.g.: whereas ~$~ would need to be escaped).
+
+Denote's identifier, title and keywords retain exactly the same functionnality.  Thus, the Denote Paperless file-naming scheme use the same format as the original package:
+
+#+begin_src
+IDENTIFIER--TITLE__KEYWORDS==DOCDATE%%CORRESPONDANT&&DOCTYPE##ASN.EXT
+#+end_src
+
+**** Document date
+
+The name is intentionally vague to let the user decide what this "document date" is about.
+
+I personally use this as the document creation date (which corresponds to the date a letter was written for instance), but it could be the date when the document was digitalized/scanned or added to the Denote directory.
+
+**** Document type
+
+This is what the document is about, such as a letter, an invoice or a certificate.
+
+**** Correspondent
+
+The person, institution or company that a document either originates from, or is sent to.  
+
+**** Archive serial number (ASN)
+
+An identifier tying the original physical copy of a document and its digital one.
+
+The ASN acts as a single source of truth for all the documents one have to keep physically, while still using the Denote Paperless workflow.  If one needs to keep a document in its physical form:
+
+1. write the ASN on the document before scanning,
+2. scan the document,
+3. store the document in a binder where all documents are sorted by ascending ASN,
+4. assign the ASN to the digital file
+
+The idea behind this process is to never have to use the physical binders to find a document.  If you need a specific document, you may find it by using the ASN in the file name to find the physical document in the binder.
+
+The workflow is more detailed [[https://docs.paperless-ngx.com/usage/#usage-recommended-workflow][here]].
+
+**** Identifier
+
+Because of the document date purpose to... store a date, identifiers are now simple incrementing integers, instead of a timestamp.
+
+This allows documents to be referenced easily (via a Denote link for instance) without ever touching the identifier again, and still be able to change the document metadata later.
+
+** Denote's phylosophy
+
+While this new file-naming scheme could appear to have introduced a different behavior from Denote, in reality it has not.  Denote Paperless tries its best to embrace the code design principles of Denote:
+
+- Predictability :: File names must follow a consistent and descriptive naming convention.
+ 
+- Composability :: Integrate with other packages or built-in functionality instead of re-inventing the wheel (Unix phylosophy).
+ 
+- Portability :: PDF documents and images aren't plain text, but we can do our best to mitigate the use of, yet another, binary-based system.  No need for a database or some specialized software.
+ 
+- Flexibility :: Do not assume the user's preference.  This package will not configure variables for you, it is up to the user to decide.  Configuration examples are provided in the manual.
+ 
+- Hackability :: Denote Paperless's code base consists of small and reusable functions that all have documentation strings (similarly to Denote's code base).  Feel free to modify and tweak the workflow to your liking.
+
+** Installation
+
+Only manual installation is available at the moment.  Clone this projet and add it to your Emacs's configuration directory.
+
+** User manual
+
+While all the symbols defined in denote-paperless are well documented and well-suited for explorability, understanding the overarching ideas always make a difference in its usability.
+
+#+begin_quote
+If you haven't already, I strongly recommend to skim through the excellent [[https://protesilaos.com/emacs/denote][Denote manual]] first.  All the core concepts are thoroughly explained.
+#+end_quote
+
+*** Sample configuration
+
+In the same spirit as Denote, Denote Paperless does not enforce any customization options on its users.
+
+Here is a minimal working configuration to get started with the package:
+
+#+begin_src elisp
+(use-package denote-paperless
+  :pin manual ; Local installation
+  :ensure nil
+  :demand t
+  :load-path "~/.emacs.d/local/denote-paperless/"
+  :config
+  ;; MANDATORY for Denote Paperless to work, otherwise the new
+  ;; separators will be removed during the rename operation.
+  (setf (cdr (assoc 'signature denote-file-name-slug-functions)) 'denote-paperless-sluggify-signature)
+  :custom
+  (denote-directory ("~/data/paperless/documents/"))
+  (denote-rename-confirmations '(modify-file-name))
+  (denote-file-name-components-order '(signature title keywords identifier))
+  (denote-prompts '(docdate title))
+  ;; Denote paperless additional variables
+  ;; Components to prompt the user for when mass renaming
+  (denote-paperless-prompts-multiple '(correspondent doctype keywords))
+  ;; Lists of predefined correspondents and document types
+  (denote-paperless-known-correspondents-file "~/paperless/correspondents.txt")
+  (denote-paperless-known-doctypes-file "~/paperless/doctypes.txt")
+  ;; Directory to copy files sent to the basket
+  (denote-paperless-basket-directory "~/paperless/basket/")
+  :config
+  ;; Populating subcomponent predefined lists
+  (denote-paperless-refresh-correspondents)
+  (denote-paperless-refresh-doctypes)
+  :hook
+  ;; Fontify file names when in dired-mode
+  (dired-mode . denote-paperless-dired-mode))
+#+end_src
+
+#+begin_comment
+Available commands
+
+On top of what Denote offers, you can now use new commands targeted for document file management.
+#+end_comment
+
+*** New signature
+
+*Important*: for Denote Paperless to work properly, you *must* use a different signature sluggification than the default one provided by Denote.  Why?  Because Denote Paperless uses new delimiters for its subcomponents.  Fortunately, Denote Paperless provides a function for this called ~denote-paperless-sluggify-signature~.
+
+To use this function instead of the default on, use the following in your Emacs configuration:
+
+#+begin_src elisp
+(setf (cdr (assoc 'signature denote-file-name-slug-functions)) 'denote-paperless-sluggify-signature)
+#+end_src
+
+*** Populate correspondents and doctypes predefined lists
+
+To make your life easier, correspondents and document types prompting the user for a value among a list of predefined values.  This has the advantage of reducing typing mistakes when filling document metadata.
+
+Each list resides within a file.  You can customize the file paths with ~denote-paperless-known-correspondents-file~ for correspondents, and ~denote-paperless-known-doctypes-file~ for documents types.  This allows to update each list while using Emacs and keep the data between restart, without having to edit configuration files.
+
+You can easily add a value to each list with ~denote-paperless-add-correspondant~ and ~denote-paperless-add-doctype~ respectively.  Each of these commands will check for existing values within the files and prevent any (case sensitive) duplicates from being added.
+
+For instance, you can get started with these files:
+
+~correspondents.txt~
+
+#+begin_src text
+Gouvernment
+PostOffice
+Pharmacy
+#+end_src
+
+~doctypes.txt~
+
+#+begin_src text
+Letter
+Invoice
+Certificate
+#+end_src
+
+Alternatively, you can populate each file manually.  However, you will need to call ~denote-paperless-refresh-correspondants~ and/or ~denote-paperless-refresh-doctypes~ afterward to refresh each list by reading the files.
+
+#+begin_quote
+If you don't want to use the correspondent and docytpe files to prefil the data, this is completely okay.  You can define the value of ~denote-paperless-known-correspondents~ and ~denote-paperless-known-doctypes~ directly and leave ~denote-paperless-known-correspondents-file~ and ~denote-paperless-known-doctypes-file~ as default.
+#+end_quote
+
+*** Rename a single file
+
+Similarly to ~denote-rename-file~, ~denote-paperless-rename-file~ prompts the user for component values depending on the value of ~denote-prompts~ to rename the currently visited file.
+
+Since Denote Paperless uses the signature component to manage the additional subcomponents, note that ~signature~ cannot be used anymore in ~denote-prompts~.  In Denote Paperless context, the available symbols are: ~identifier~, ~title~, ~keywords~, ~asn~, ~docdate~, ~doctype~ and ~correspondent~.  Please note that this rule applies only *in Denote Paperless context*, ~denote-prompts~ will work as usual within a Denote context (e.g.: using ~denote-rename~).
+
+Additionally, a set of convienience commands exists to act on individual components:
+
+- ~denote-paperless-rename-file-identifier~
+- ~denote-paperless-rename-file-title~
+- ~denote-paperless-rename-file-keywords~
+- ~denote-paperless-rename-file-asn~
+- ~denote-paperless-rename-file-docdate~
+- ~denote-paperless-rename-file-doctype~
+- ~denote-paperless-rename-file-correspondant~
+- ~denote-paperless-rename-file-signature~ (will prompt for ~asn~, ~docdate~, ~doctype~ and ~correspondent~)
+
+*** Rename several files with a prompt for each file
+
+To rename multiple files within Dired while prompting the user for each marked file, use ~denote-paperless-dired-rename-marked-files-individually~.  It works exactly like ~denote-dired-rename-files~.  Customize ~denote-prompts~ to define what the user will be prompted for.
+
+Additionally, a set of convienience commands exists to act on individual components:
+
+- ~denote-paperless-dired-rename-marked-files-individually-title~
+- ~denote-paperless-dired-rename-marked-files-individually-keywords~
+- ~denote-paperless-dired-rename-marked-files-individually-asn~
+- ~denote-paperless-dired-rename-marked-files-individually-docdate~
+- ~denote-paperless-dired-rename-marked-files-individually-doctype~
+- ~denote-paperless-dired-rename-marked-files-individually-correspondant~
+- ~denote-paperless-dired-rename-marked-files-individually-signature~ (will prompt for ~asn~, ~docdate~, ~doctype~ and ~correspondent~)
+
+*** Rename several files with a single prompt for all
+
+To rename mutiple files within Dired while prompting the only once for all marked files, use ~denote-paperless-dired-rename-marked-files-collectively~.  It works similarly to ~denote-dired-rename-marked-files-with-keywords~.
+Customize ~denote-paperless-prompts-multiple~ the same way as ~denote-prompts~ to define what the user will be prompted for.  The available symbols are: ~title~, ~keywords~, ~asn~, ~docdate~, ~doctype~, and ~correspondent~.
+
+Additionally, a set of convienience commands exists to act on individual components:
+
+- ~denote-paperless-dired-rename-marked-files-collectively-title~
+- ~denote-paperless-dired-rename-marked-files-collectively-keywords~
+- ~denote-paperless-dired-rename-marked-files-collectively-asn~
+- ~denote-paperless-dired-rename-marked-files-collectively-docdate~
+- ~denote-paperless-dired-rename-marked-files-collectively-doctype~
+- ~denote-paperless-dired-rename-marked-files-collectively-correspondant~
+- ~denote-paperless-dired-rename-marked-files-collectively-signature~ (will prompt for ~asn~, ~docdate~, ~doctype~ and ~correspondent~)
+
+*** Dired fontification
+
+While in Dired, use ~denote-paperless-dired-mode~ to fontify file names to match the new file-naming scheme.
+
+*** Basket
+
+The basket is a concept I borrowed from [[https://damselfly.info/][damselfly]].  This is basically a directory outside of the Denote Paperless directory to export files to.
+
+The concept is simple: let's say your local administration requires a bunch of documents for a new passport.  It would be quite tedious to mark all files in Dired, copy them to a dedicated location on your computer, and trim down file names to send them by email.  Well, the basket exists solely for that purpose: calling the command ~denote-paperless-dired-copy-to-basket~ copies marked files in Dired to ~denote-paperless-basket-directory~, and rename them to only keep the document date and the title.  If multiple files would happen to have the same name, this is handled gracefully by adding a incrementing integer as a suffix.
+
+Feel free to then iterate upon that building block by calling your favorite archive manager afterwards!
+
+*** Maintenance
+
+**** Find duplicates
+
+This is something that is well documented in [[https://protesilaos.com/emacs/denote#h:9051f15d-ea7e-4b17-adc2-bc6a749c721b][Denote manual]].  Denote Paperless include these commands by default just to make your life easier.  Each of these commands will display a Dired buffer with *all* file with a duplicate:
+
+- Call ~denote-paperless-dired-show-duplicate-asn~ to display duplicate ASNs.
+- call ~denote-paperless-dired-show-duplicate-identifiers~ to display duplicate identifiers.
+
+**** Check current maximum ASN
+
+The current maximum ASN is already displayed in the user prompt, but the command ~denote-paperless-retrieve-max-asn~ might be useful outside of that context.
+
+*** Configuration recommendations
+
+**** Use ~.dir-locals.el~
+
+Denote Paperless is meant to be used alongside Denote.  If you intend to do so, I would highly suggest using a separate silo for your document management with ~.dir-locals.el~.  See [[https://protesilaos.com/emacs/denote#h:15719799-a5ff-4e9a-9f10-4ca03ef8f6c5][this section in Denote manual]] to check the implementation details of ~denote-silo.el~.
+
+** FAQ
+
+*** How does Denote Paperless handle identifiers?
+
+Denote Paperless take the maximum existing identifier and adds 1.
+
+If you would like to customize (e.g.: zero-pad) the identifier, use ~denote-paperless-integer-identifier-format~.
+
+*** How to change the order of the signature subcomponents?
+
+Unfortunaly for now this is not possible.  If you really want to implement this, you can edit the function ~denote-paperless--concat-subcomponents~.
+
+*** How to reproduce the views from Paperless-ngx?
+
+I would suggest to give a try to [[https://protesilaos.com/emacs/denote-org][denote-org.el]] and its dynamic block feature.
+
+*** How to migrate from Paperless-ngx?
+
+#+begin_quote
+Before any migration operation, make appropriate backups of your files and/or databases.  *You* are responsible of *your* data!
+#+end_quote
+
+I can provide the method I used while migrating from Paperless-ngx 2.15.1.  For this I used the [[https://docs.paperless-ngx.com/advanced_usage/#filename-templates][filename templates]] to customize the [[https://docs.paperless-ngx.com/configuration/#PAPERLESS_FILENAME_FORMAT][~PAPERLESS_FILENAME_FORMAT~]] variable.  The arrangement of the template will vary depending on how you want to customize your file-naming scheme:
+
+#+begin_src text
+=={{ created | datetime('%Y%m%d') }}{{ "%%" + correspondent }}{{ "&&" + document_type }}{{ "##" + asn }}{{ "--" + title|slugify }}{% if tag_name_list | length > 0 %}{{ "__" + tag_name_list | join('_') }}{% endif %}@@{{ doc_pk }}
+#+end_src
+
+This Jinja2 template would output the following Denote format:
+
+#+begin_src
+==DOCDATE%%CORRESPONDENT&&DOCTYPE##ASN--TITLE__KEYWORDS@@IDENTIFIER.EXT
+#+end_src
+
+#+begin_quote
+Paperless-ngx 2.15.1 uses a custom implementation of Jinja2 within Django, see [[https://docs.djangoproject.com/en/6.0/topics/templates/][this]] and [[https://docs.djangoproject.com/en/6.0/ref/templates/][this]] for more information.
+#+end_quote
+
+Once the variable has been updated, run ~document_exporter -f -z -p~ on your Paperless-ngx machine/container (see the [[https://docs.paperless-ngx.com/administration/#exporter][~document_exporter~ documentation]]).  You should be good to go in Denote Paperless!
+
+N.B.: If you have empty values within Paperless-ngx fields, you will get "~none~" in your exported file names.  Apparently there is a [[https://docs.paperless-ngx.com/configuration/#PAPERLESS_FILENAME_FORMAT_REMOVE_NONE][variable]] that can influence this behavior, but I could not get it to work.  Instead, I used a small Python script to remove these empty values from the file names.
+
+** How this package came to life
+
+I took interest in Denote back in 2022 and thought it was very promising.  The dedication of [[https://protesilaos.com/][Protesilaos Stavrou]] to making such an excellent package coupled with a delightful documentation comforted me in investing time to dig deeper into Denote.
+
+At the time, I was satisfied by using Paperless-ngx on a small Docker instance, but I was actively looking for an less featureful implementation.  I didn't need all of its capabilities such as templates, filters, rules or OCR.  Plus, relying on a server, a fully-fledged web application and a database just to rename documents made the whole process kind of cumbersome.
+
+After a while I really needed to switch to a local solution, so I eventually decided to do it on my own!
+
+** Licence
+
+See the licence [[./LICENCE][here]].
