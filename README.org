@@ -26,10 +26,10 @@ I took heavy inspiration from [[https://docs.paperless-ngx.com/usage/][the usage
 
 Denote Paperless builds upon the curated Denote's code base to bring life to 4 new subcomponents:
 
-1. A document date,
-2. A document type,
-3. A correspondent,
-4. An archive Serial Number or ASN.
+1. a document date,
+2. a document type,
+3. a correspondent,
+4. an archive Serial Number or ASN.
 
 A concatenation of these new subcomponents replace Denote's signature as a whole, with the following format:
 
@@ -45,21 +45,21 @@ Denote's identifier, title and keywords retain exactly the same functionnality. 
 IDENTIFIER--TITLE__KEYWORDS==DOCDATE%%CORRESPONDANT&&DOCTYPE##ASN.EXT
 #+end_src
 
-**** Document date
+**** Document date (~DOCDATE~)
 
 The name is intentionally vague to let the user decide what this "document date" is about.
 
 I personally use this as the document creation date (which corresponds to the date a letter was written for instance), but it could be the date when the document was digitalized/scanned or added to the Denote directory.
 
-**** Document type
+**** Document type (~DOCTYPE~)
 
 This is what the document is about, such as a letter, an invoice or a certificate.
 
-**** Correspondent
+**** Correspondent (~CORRESPONDENT~)
 
 The person, institution or company that a document either originates from, or is sent to.  
 
-**** Archive serial number (ASN)
+**** Archive Serial Number (~ASN~)
 
 An identifier tying the original physical copy of a document and its digital one.
 
@@ -144,12 +144,6 @@ Here is a minimal working configuration to get started with the package:
   (dired-mode . denote-paperless-dired-mode))
 #+end_src
 
-#+begin_comment
-Available commands
-
-On top of what Denote offers, you can now use new commands targeted for document file management.
-#+end_comment
-
 *** New signature
 
 *Important*: for Denote Paperless to work properly, you *must* use a different signature sluggification than the default one provided by Denote.  Why?  Because Denote Paperless uses new delimiters for its subcomponents.  Fortunately, Denote Paperless provides a function for this called ~denote-paperless-sluggify-signature~.
@@ -170,10 +164,12 @@ You can easily add a value to each list with ~denote-paperless-add-correspondant
 
 For instance, you can get started with these files:
 
+Alternatively, you can populate each file manually.  However, you will need to call ~denote-paperless-refresh-correspondants~ and/or ~denote-paperless-refresh-doctypes~ afterward to refresh each list by reading the files.
+
 ~correspondents.txt~
 
 #+begin_src text
-Gouvernment
+Government
 PostOffice
 Pharmacy
 #+end_src
@@ -186,15 +182,13 @@ Invoice
 Certificate
 #+end_src
 
-Alternatively, you can populate each file manually.  However, you will need to call ~denote-paperless-refresh-correspondants~ and/or ~denote-paperless-refresh-doctypes~ afterward to refresh each list by reading the files.
-
 #+begin_quote
-If you don't want to use the correspondent and docytpe files to prefil the data, this is completely okay.  You can define the value of ~denote-paperless-known-correspondents~ and ~denote-paperless-known-doctypes~ directly and leave ~denote-paperless-known-correspondents-file~ and ~denote-paperless-known-doctypes-file~ as default.
+If you don't want to use the correspondent and docytpe files to prefill the data, this is completely okay.  You can define the value of ~denote-paperless-known-correspondents~ and ~denote-paperless-known-doctypes~ directly and leave ~denote-paperless-known-correspondents-file~ and ~denote-paperless-known-doctypes-file~ as default.
 #+end_quote
 
 *** Rename a single file
 
-Similarly to ~denote-rename-file~, ~denote-paperless-rename-file~ prompts the user for component values depending on the value of ~denote-prompts~ to rename the currently visited file.
+To rename a the currently visited file, use ~denote-paperless-rename-file~. Similarly to ~denote-rename-file~, it will prompts the user for component values depending on the value of ~denote-prompts~.
 
 Since Denote Paperless uses the signature component to manage the additional subcomponents, note that ~signature~ cannot be used anymore in ~denote-prompts~.  In Denote Paperless context, the available symbols are: ~identifier~, ~title~, ~keywords~, ~asn~, ~docdate~, ~doctype~ and ~correspondent~.  Please note that this rule applies only *in Denote Paperless context*, ~denote-prompts~ will work as usual within a Denote context (e.g.: using ~denote-rename~).
 
@@ -211,7 +205,7 @@ Additionally, a set of convienience commands exists to act on individual compone
 
 *** Rename several files with a prompt for each file
 
-To rename multiple files within Dired while prompting the user for each marked file, use ~denote-paperless-dired-rename-marked-files-individually~.  It works exactly like ~denote-dired-rename-files~.  Customize ~denote-prompts~ to define what the user will be prompted for.
+To rename multiple marked files within Dired while prompting the user for each file, use ~denote-paperless-dired-rename-marked-files-individually~.  It works exactly like ~denote-dired-rename-files~.  Customize ~denote-prompts~ to define what the user will be prompted for.
 
 Additionally, a set of convienience commands exists to act on individual components:
 
@@ -225,7 +219,7 @@ Additionally, a set of convienience commands exists to act on individual compone
 
 *** Rename several files with a single prompt for all
 
-To rename mutiple files within Dired while prompting the only once for all marked files, use ~denote-paperless-dired-rename-marked-files-collectively~.  It works similarly to ~denote-dired-rename-marked-files-with-keywords~.
+To rename mutiple marked files within Dired while prompting the user only once for all files, use ~denote-paperless-dired-rename-marked-files-collectively~.  It works similarly to ~denote-dired-rename-marked-files-with-keywords~.
 Customize ~denote-paperless-prompts-multiple~ the same way as ~denote-prompts~ to define what the user will be prompted for.  The available symbols are: ~title~, ~keywords~, ~asn~, ~docdate~, ~doctype~, and ~correspondent~.
 
 Additionally, a set of convienience commands exists to act on individual components:
@@ -254,14 +248,14 @@ Feel free to then iterate upon that building block by calling your favorite arch
 
 **** Find duplicates
 
-This is something that is well documented in [[https://protesilaos.com/emacs/denote#h:9051f15d-ea7e-4b17-adc2-bc6a749c721b][Denote manual]].  Denote Paperless include these commands by default just to make your life easier.  Each of these commands will display a Dired buffer with *all* file with a duplicate:
+This is something that is well documented in [[https://protesilaos.com/emacs/denote#h:9051f15d-ea7e-4b17-adc2-bc6a749c721b][Denote manual]].  Denote Paperless include these commands by default just to make your life easier.  Each of these commands will display a Dired buffer with *all* files with a duplicate:
 
 - Call ~denote-paperless-dired-show-duplicate-asn~ to display duplicate ASNs.
-- call ~denote-paperless-dired-show-duplicate-identifiers~ to display duplicate identifiers.
+- Call ~denote-paperless-dired-show-duplicate-identifiers~ to display duplicate identifiers.
 
 **** Check current maximum ASN
 
-The current maximum ASN is already displayed in the user prompt, but the command ~denote-paperless-retrieve-max-asn~ might be useful outside of that context.
+The current maximum ASN is already displayed in the user prompt when calling a ~denote-paperless-rename-*~ command, but the command ~denote-paperless-retrieve-max-asn~ might be useful outside of that context.
 
 *** Configuration recommendations
 
@@ -275,7 +269,7 @@ Denote Paperless is meant to be used alongside Denote.  If you intend to do so, 
 
 Denote Paperless take the maximum existing identifier and adds 1.
 
-If you would like to customize (e.g.: zero-pad) the identifier, use ~denote-paperless-integer-identifier-format~.
+If you would like to customize (e.g.: zero-pad) the identifier format, use ~denote-paperless-integer-identifier-format~.
 
 *** How to change the order of the signature subcomponents?
 
@@ -283,7 +277,7 @@ Unfortunaly for now this is not possible.  If you really want to implement this,
 
 *** How to reproduce the views from Paperless-ngx?
 
-I would suggest to give a try to [[https://protesilaos.com/emacs/denote-org][denote-org.el]] and its dynamic block feature.
+I would suggest giving a try to [[https://protesilaos.com/emacs/denote-org][denote-org.el]] and its dynamic block feature, or the [[https://protesilaos.com/emacs/denote#h:9bec2c83-36ca-4951-aefc-7187c5463f90][query link]] feature from Denote.
 
 *** How to migrate from Paperless-ngx?
 
@@ -307,7 +301,7 @@ This Jinja2 template would output the following Denote format:
 Paperless-ngx 2.15.1 uses a custom implementation of Jinja2 within Django, see [[https://docs.djangoproject.com/en/6.0/topics/templates/][this]] and [[https://docs.djangoproject.com/en/6.0/ref/templates/][this]] for more information.
 #+end_quote
 
-Once the variable has been updated, run ~document_exporter -f -z -p~ on your Paperless-ngx machine/container (see the [[https://docs.paperless-ngx.com/administration/#exporter][~document_exporter~ documentation]]).  You should be good to go in Denote Paperless!
+Once the variable has been updated, run ~document_exporter -f -z -p~ on your Paperless-ngx machine/container (see the ~document_exporter~ [[https://docs.paperless-ngx.com/administration/#exporter][documentation]]).  You should be good to go in Denote Paperless!
 
 N.B.: If you have empty values within Paperless-ngx fields, you will get "~none~" in your exported file names.  Apparently there is a [[https://docs.paperless-ngx.com/configuration/#PAPERLESS_FILENAME_FORMAT_REMOVE_NONE][variable]] that can influence this behavior, but I could not get it to work.  Instead, I used a small Python script to remove these empty values from the file names.
 
