@@ -1,7 +1,7 @@
 * denote-paperless.el
 
 #+begin_quote
-This project is young, please report any bug you find [[./issues][here]].
+This project is young, please report any bug you find [[https://codeberg.org/matthieumuller/denote-paperless/issues][here]].
 #+end_quote
 
 Paperless on top of [[https://protesilaos.com/emacs/denote][denote.el]], an efficient, low overhead and no-nonsense approach to document management.
