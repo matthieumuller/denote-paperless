@@ -1,3 +1,5 @@
+* ⚠️ The project has moved to https://codeberg.org/matthieumuller/denote-paperless
+
 * denote-paperless.el
 
 #+begin_quote
