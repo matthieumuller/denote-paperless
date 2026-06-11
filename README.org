@@ -1,7 +1,7 @@
 * denote-paperless.el
 
 #+begin_quote
-This project is young, please report any bug you find [[https://github.com/matthieumuller/denote-paperless/issues][here]].
+This project is young, please report any bug you find [[./issues][here]].
 #+end_quote
 
 Paperless on top of [[https://protesilaos.com/emacs/denote][denote.el]], an efficient, low overhead and no-nonsense approach to document management.
@@ -20,7 +20,7 @@ Compared to Denote, Denote Paperless introduces new concepts:
 
 I am not inventing anything new, the people who worked on [[https://github.com/the-paperless-project/paperless][Paperless]], [[https://github.com/jonaswinkler/paperless-ng][Paperless-ng]] and [[https://github.com/paperless-ngx/paperless-ngx][Paperless-ngx]] had already figured –in my humble opinion– a very good way to handle documents.
 
-I took heavy inspiration from [[https://docs.paperless-ngx.com/usage/][the usage phylosophy described by Paperless-ngx]] to lay down the groundwork for this package.
+I took heavy inspiration from [[https://docs.paperless-ngx.com/usage/][the usage philosophy described by Paperless-ngx]] to lay down the groundwork for this package.
 
 *** Same file-naming scheme, different components
 
@@ -80,13 +80,13 @@ Because of the document date purpose to... store a date, identifiers are now sim
 
 This allows documents to be referenced easily (via a Denote link for instance) without ever touching the identifier again, and still be able to change the document metadata later.
 
-** Denote's phylosophy
+** Denote's philosophy
 
 While this new file-naming scheme could appear to have introduced a different behavior from Denote, in reality it has not.  Denote Paperless tries its best to embrace the code design principles of Denote:
 
 - Predictability :: File names must follow a consistent and descriptive naming convention.
  
-- Composability :: Integrate with other packages or built-in functionality instead of re-inventing the wheel (Unix phylosophy).
+- Composability :: Integrate with other packages or built-in functionality instead of re-inventing the wheel (Unix philosophy).
  
 - Portability :: PDF documents and images aren't plain text, but we can do our best to mitigate the use of, yet another, binary-based system.  No need for a database or some specialized software.
  

@@ -4,7 +4,7 @@
 
 ;; Author: Matthieu MULLER <contact@mmuller.dev>
 ;; Maintainer: Matthieu MULLER <contact@mmuller.dev>
-;; URL: https://github.com/matthieumuller/denote-paperless
+;; URL: https://codeberg.org/matthieumuller/denote-paperless
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "28.1") (denote "4.1"))
 
@@ -38,7 +38,7 @@
 ;; It builds on the curated Denote's code base to bring 4 new subcomponents: a
 ;; document date, a document type, a correspondent, and a archive serial number.
 ;; Read the manual to understand how they integrate to Denote's logic and how
-;; you should use them: https://github.com/matthieumuller/denote-paperless
+;; you should use them: https://codeberg.org/matthieumuller/denote-paperless
 ;;
 ;; Denote Paperless also tries its best to embrace the code design principles of
 ;; Denote:
@@ -47,7 +47,7 @@
 ;;   naming convention.
 ;; 
 ;; * Composability :: Integrate with other packages or built-in functionality
-;;   instead of re-inventing the wheel (Unix phylosophy).
+;;   instead of re-inventing the wheel (Unix philosophy).
 ;;
 ;; * Portability :: PDF documents and images aren't plain text, but we can do
 ;;   our best to mitigate the use of, yet another, binary-based system.  No need
@@ -69,7 +69,7 @@
   "Paperless system on top of `denote', an efficient file-naming scheme for your documents."
   :group 'files
   :link '(info-link "(denote-paperless) Top")
-  :link '(url-link :tag "Homepage" "https://github.com/matthieumuller/denote-paperless"))
+  :link '(url-link :tag "Homepage" "https://codeberg.org/matthieumuller/denote-paperless"))
 
 (defun denote-paperless-string-to-integer (string)
   "Parse STRING as an integer number and return the number.
@@ -1032,22 +1032,22 @@ Copy-pasta of `denote-faces-signature-matcher'."
   :group 'denote-paperless-faces
   :package-version '(denote-paperless . "0.1.0"))
  
-(defface denote-paperless-faces-asn '((t :inherit font-lock-warning-face))
+(defface denote-paperless-faces-asn '((t :inherit denote-paperless-faces-identifier))
   "Face for file name ASN in Dired buffers."
   :group 'denote-paperless-faces
   :package-version '(denote-paperless . "0.1.0"))
 
-(defface denote-paperless-faces-docdate '((t :inherit font-lock-warning-face))
+(defface denote-paperless-faces-docdate '((t :inherit denote-faces-date))
   "Face for file name docdate in Dired buffers."
   :group 'denote-paperless-faces
   :package-version '(denote-paperless . "0.1.0"))
 
-(defface denote-paperless-faces-doctype '((t :inherit font-lock-warning-face))
+(defface denote-paperless-faces-doctype '((t :inherit font-lock-string-face))
   "Face for file name doctype in Dired buffers."
   :group 'denote-paperless-faces
   :package-version '(denote-paperless . "0.1.0"))
 
-(defface denote-paperless-faces-correspondent '((t :inherit font-lock-warning-face))
+(defface denote-paperless-faces-correspondent '((t :inherit font-lock-type-face))
   "Face for file name correspondent in Dired buffers."
   :group 'denote-paperless-faces
   :package-version '(denote-paperless . "0.1.0"))
